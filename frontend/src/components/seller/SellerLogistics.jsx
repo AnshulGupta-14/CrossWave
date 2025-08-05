@@ -37,10 +37,10 @@ const SellerLogistics = () => {
         },
         address: {
           streetLines: ["nkl"],
-          city: "ghj",
-          stateOrProvinceCode: "yb",
-          postalCode: "45678",
-          countryCode: "xa",
+          city: "Memphis",
+          stateOrProvinceCode: "TN",
+          postalCode: "38116",
+          countryCode: "US",
         },
       },
       recipients: [
@@ -54,7 +54,7 @@ const SellerLogistics = () => {
             city: "",
             stateOrProvinceCode: "",
             postalCode: "",
-            countryCode: "ax",
+            countryCode: "IN",
           },
         },
       ],
@@ -119,7 +119,7 @@ const SellerLogistics = () => {
 
   const [pickupFormData, setPickupFormData] = useState({
     associatedAccountNumber: {
-      value: "XXX561073",
+      value: "740561073",
     },
     originDetail: {
       pickupLocation: {
@@ -132,7 +132,7 @@ const SellerLogistics = () => {
           city: "",
           stateOrProvinceCode: "",
           postalCode: "",
-          countryCode: "US",
+          countryCode: "IN",
         },
       },
       readyDateTimestamp: new Date().toISOString(),
@@ -143,7 +143,7 @@ const SellerLogistics = () => {
 
   const [cancelPickupFormData, setCancelPickupFormData] = useState({
     associatedAccountNumber: {
-      value: "XXX561073",
+      value: "740561073",
     },
     pickupConfirmationCode: "",
     carrierCode: "FDXE",
@@ -227,6 +227,8 @@ const SellerLogistics = () => {
     trackingNumber: "",
   });
 
+  console.log(pickupFormData);
+
   const logisticsStats = [
     {
       title: "Active Shipments",
@@ -261,18 +263,18 @@ const SellerLogistics = () => {
 
   useEffect(() => {
     // Fetch shipments
-    console.log("User ID: ", user.id);
+    console.log("User ID: ", user?.id);    
 
     axios
-      .get(`http://localhost:3000/logistics/shipments/${user.id}`)
+      .get(`http://localhost:3000/logistics/shipments/${user?.id}`)
       .then((response) => {
-        setShipments(response.data);
-        console.log(shipments);
+        setShipments(response.data.data);
+        console.log("shipments: ",response.data.data);
       })
       .catch((error) => {
         console.log(error);
       });
-  }, []);
+  },[]);
 
   // Add this CSS at the beginning of your component
   const scrollbarHiddenStyles = {
@@ -287,11 +289,10 @@ const SellerLogistics = () => {
     e.preventDefault();
     // Add your logic to submit pickup form
     console.log(pickupFormData);
-    pickupFormData.seller_id = user.id;
     const toastId = toast.loading("Creating Pickup...", { duration: Infinity });
 
     axios
-      .post("http://localhost:3000/logistics/create-pickup", pickupFormData)
+      .post(`http://localhost:3000/logistics/create-pickup/${user?.id}`, pickupFormData)
       .then((response) => {
         console.log(response);
         // Show success message or redirect to tracking page
@@ -301,7 +302,7 @@ const SellerLogistics = () => {
         // Reset form data
         setPickupFormData({
           associatedAccountNumber: {
-            value: "XXX561073",
+            value: "740561073",
           },
           originDetail: {
             pickupLocation: {
@@ -314,7 +315,7 @@ const SellerLogistics = () => {
                 city: "",
                 stateOrProvinceCode: "",
                 postalCode: "",
-                countryCode: "US",
+                countryCode: "IN",
               },
             },
             readyDateTimestamp: new Date().toISOString(),
@@ -379,7 +380,7 @@ const SellerLogistics = () => {
     });
     try {
       const response = await axios.post(
-        "http://localhost:3000/logistics/create-shipment",
+        `http://localhost:3000/logistics/create-shipment/${user?.id}`,
         formData
       );
       toast.success("Shipment Created!!", { id: toastId, duration: 3000 });
@@ -390,15 +391,15 @@ const SellerLogistics = () => {
         requestedShipment: {
           shipper: {
             contact: {
-              personName: "",
-              phoneNumber: "",
+              personName: "ash",
+              phoneNumber: "1122334455",
             },
             address: {
-              streetLines: [""],
-              city: "",
-              stateOrProvinceCode: "",
-              postalCode: "",
-              countryCode: "",
+              streetLines: ["nkl"],
+              city: "Memphis",
+              stateOrProvinceCode: "TN",
+              postalCode: "38116",
+              countryCode: "US",
             },
           },
           recipients: [
@@ -412,7 +413,7 @@ const SellerLogistics = () => {
                 city: "",
                 stateOrProvinceCode: "",
                 postalCode: "",
-                countryCode: "",
+                countryCode: "IN",
               },
             },
           ],
@@ -1425,12 +1426,12 @@ const SellerLogistics = () => {
         // Reset form
         setCancelPickupFormData({
           associatedAccountNumber: {
-            value: "XXX561073",
+            value: "740561073",
           },
           pickupConfirmationCode: "",
           carrierCode: "FDXE",
           scheduledDate: new Date().toISOString().split("T")[0],
-          location: "NQAA",
+          location: "",
         });
       })
       .catch((error) => {
@@ -1818,8 +1819,6 @@ const SellerLogistics = () => {
                   <th className="text-left py-3 px-4">Customer</th>
                   <th className="text-left py-3 px-4">Destination</th>
                   <th className="text-left py-3 px-4">Status</th>
-                  <th className="text-left py-3 px-4">ETA</th>
-                  <th className="text-left py-3 px-4">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -1835,9 +1834,9 @@ const SellerLogistics = () => {
                       }}
                       className="border-t"
                     >
-                      <td className="py-3 px-4">{shipment.id}</td>
+                      <td className="py-3 px-4">{shipment.trackingNumber}</td>
                       <td className="py-3 px-4">{shipment.product}</td>
-                      <td className="py-3 px-4">{shipment.customer}</td>
+                      <td className="py-3 px-4">{shipment.customerName}</td>
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-1">
                           <FaMapMarkerAlt className="text-red-500" />
@@ -1854,18 +1853,8 @@ const SellerLogistics = () => {
                               : "bg-yellow-100 text-yellow-600"
                           }`}
                         >
-                          {shipment.status}
+                          {"in-transit"}
                         </span>
-                      </td>
-                      <td className="py-3 px-4">{shipment.eta}</td>
-                      <td className="py-3 px-4">
-                        <motion.button
-                          whileHover={{ scale: 1.1 }}
-                          whileTap={{ scale: 0.9 }}
-                          className="text-blue-600 hover:text-blue-700"
-                        >
-                          Track
-                        </motion.button>
                       </td>
                     </motion.tr>
                   ))}
